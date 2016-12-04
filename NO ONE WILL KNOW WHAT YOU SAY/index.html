@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no">
+	
+	<link rel="stylesheet" href="styles/main.css">
+	<link rel="stylesheet" href="styles/dialog-list.css">
+	<link rel="stylesheet" href="styles/info-bar.css">
+	<link rel="stylesheet" href="styles/chat-panel.css">
+	
+	<script src="scripts/ui.js"></script>
+	
+	<title>nooneknow.ru</title>
+
+</head>
+<body>
+
+	<div class="info-bar">
+		INFO-BAR | LIMIDE CREEPTER | Information Security and Web branch of LIMIDE | http://vk.com/limide | http://vk.com/jkulvich
+	</div>
+	
+	<div class="dialog-list"></div>
+	
+	<div class="chat-panel">
+		<div class="chat-body">
+			<div class="chat-area">
+				<textarea placeholder="Type here... | You are in OFFLINE now" onkeyup="(function() { charCount(); })();" onkeydown="(function() { keyDownSend(event.keyCode); })();";></textarea>
+				<div id="charcount">
+					0 chars, 0 words, 0 sentences, 0 lines
+				</div>
+			</div>
+			<div id="sendbutton" onclick="(function() { sendMessage(); })();"></div>
+		</div>
+	</div>
+	
+	
+	<script src="scripts/autorun.js"></script>
+	
+</body>
+</html>

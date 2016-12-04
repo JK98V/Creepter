@@ -1,0 +1,10 @@
+.info-bar {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	width: 100vw;
+	height: 50px;
+	
+	background-color: rgba(184, 192, 192, 1);
+	color: white;
+}

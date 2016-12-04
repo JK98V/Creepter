@@ -1,0 +1,85 @@
+function creepter() {
+this.numberToBits=function(num,count){var bits=[];var tmpbits=[];while(num>0){tmpbits[tmpbits.length]=num%2;num=(num-num%2)/2; }if(count==undefined||count==null){for(var i=15;i>=0;i--){bits[bits.length]=tmpbits[i]||0}}else if(count==0){for(var i=tmpbits.length-1;i>=0;i--){bits[bits.length]=tmpbits[i]}if(bits.length<=0){bits[0]=0}}else{for(var i=count-1;i>=0;i--){bits[bits.length]=tmpbits[i]||0}}return bits};
+this.bitsToNumber=function(bits){var num=0;for(var i=0;i<bits.length;i++){num+=bits[i]*Math.pow(2,bits.length-1-i)}return num};
+this.arrMerge=function(arr1,arr2){var arr3=[];for(var i=0;i<arr1.length;i++){arr3[arr3.length]=arr1[i]}for(var i=0;i<arr2.length;i++){arr3[arr3.length]=arr2[i]}return arr3};
+this.numbersToBits=function(numbers){var bits=[];for(var i=0;i<numbers.length;i++){var arr=this.numberToBits(numbers[i]);bits=this.arrMerge(bits,arr)}return bits};
+this.bitsToNumbers=function(bits){var nums=[];for(var i=0;i<(bits.length-bits.length%16)/16;i++){var bit16=[];for(var j=i*16;j<i*16+16;j++){bit16[bit16.length]=bits[j]}nums[nums.length]=this.bitsToNumber(bit16)}return nums}
+this.stringToBits=function(str){var nums=[];for(var i=0;i<str.length;i++){nums[nums.length]=str.charCodeAt(i)}return this.numbersToBits(nums)}
+this.bitsToString=function(bits){var str="";var nums=this.bitsToNumbers(bits);for(var i=0;i<nums.length;i++){str+=String.fromCharCode(nums[i])}return str}
+this.to512Multiply=function(bits){var trash=512-(bits.length%512);for(var i=0;i<trash;i++){bits[bits.length]=(Math.random()>0.5)?1:0}var tbits=this.numberToBits(trash);var zeros=[];for(var i=0;i<496;i++){zeros[zeros.length]=(Math.random()>0.5)?1:0}tbits=this.arrMerge(zeros,tbits);bits=this.arrMerge(bits,tbits);return bits}
+this.from512Multiply=function(bits){var tbits=[];for(var i=bits.length-16;i<bits.length;i++){tbits.push(bits[i])}var tcount=this.bitsToNumber(tbits);bits.length=bits.length-512-tcount;return bits}
+this.applyGamma=function(bits,key,callback){for(var i=0;i<bits.length;i++){if(key[i%512]==1){bits[i]=(bits[i]==0)?1:0}if(callback!=undefined){callback(i/bits.length*100)}}if(callback!=undefined){callback(100)}return bits}
+this.rearrange=function(bits,N,callback){for(var i=0;i<(bits.length-(bits.length%N))/N-1;i++){for(var j=i*N;j<i*N+N;j++){var tmp=bits[j];bits[j]=bits[j+N];bits[j+N]=tmp}if(callback!=undefined){callback((i*N)/bits.length*100)}}if(callback!=undefined){callback(100)}return bits}
+this.rearrangeBack=function(bits,N,callback){for(var i=(bits.length-(bits.length%N))/N-1-1;i>=0;i--){for(var j=i*N;j<i*N+N;j++){var tmp=bits[j];bits[j]=bits[j+N];bits[j+N]=tmp}if(callback!=undefined){callback((bits.length-(i*N))/bits.length*100)}}if(callback!=undefined){callback(100)}return bits}
+this.replaceFromDictionary=function(bits,dictionary,callback){var count=dictionary[0].length;for(var i=0;i<(bits.length-bits.length%count)/count;i++){var tmpb=[];for(var j=i*count;j<i*count+count;j++){tmpb[tmpb.length]=bits[j]}var tmp=this.bitsToNumber(tmpb);if(dictionary[tmp]!==null&&dictionary[tmp]!==undefined&&dictionary[tmp].length==count){for(var j=i*count;j<i*count+count;j++){bits[j]=dictionary[tmp][j%count]}}if(callback!=undefined){callback((i*count)/bits.length*100)}}if(callback!=undefined){callback(100)}return bits}
+this.replaceFromDictionaryBack=function(bits,dictionary,callback){var count=dictionary[0].length;for(var i=0;i<(bits.length-bits.length%count)/count;i++){var tmpb=[];for(var j=i*count;j<i*count+count;j++){tmpb[tmpb.length]=bits[j]}var tmpn=this.bitsToNumber(tmpb);for(var j=0;j<dictionary.length;j++){if(tmpn==this.bitsToNumber(dictionary[j])){var tobits=this.numberToBits(j,count);for(var k=i*count;k<i*count+count;k++){bits[k]=tobits[k%count]}break}}if(callback!=undefined){callback((i*count)/bits.length*100)}}if(callback!=undefined){callback(100)}return bits}
+this.generateDictionary=function(count){var dictionary=[];var vals=[];for(var i=0;i<Math.pow(2,count);i++){vals[vals.length]=this.numberToBits(i,count)}for(var i=0;i<Math.pow(2,count);i++){var r=Math.round(Math.random()*(vals.length-1));dictionary[dictionary.length]=vals[r];vals[r]=null;var tmp=[];for(var j=0;j<vals.length;j++){if(vals[j]!=null){tmp[tmp.length]=vals[j]}}vals=tmp}return dictionary}
+this.dictionaryToString=function(dictionary){var bits=[];for(var i=0;i<dictionary.length;i++){bits=this.arrMerge(bits,dictionary[i])}bits=this.arrMerge(bits,this.numberToBits(dictionary[0].length,16));return this.bitsToString(bits)}
+this.stringToDictionary=function(text){var bits=this.stringToBits(text);var bcount=[];for(var i=bits.length-16;i<bits.length;i++){bcount[bcount.length]=bits[i]}var count=this.bitsToNumber(bcount);var dictionary=[];for(var i=0;i<Math.pow(2,count);i++){var n=dictionary.length;dictionary[n]=[];for(var j=i*count;j<i*count+count;j++){dictionary[n][j%count]=bits[j]}}return dictionary}
+this.generateKey=function(){var key=[];for(var i=0;i<512;i++){key[i]=(Math.random()>0.5)?1:0}return this.bitsToString(key)}
+this.getCommands=function(){var command="";var cmds=["G","R","D"];var rear=[2,4,8,16,32,64,128,256,512];for(var i=0;i<4;i++){var cmd=cmds[Math.round(Math.random()*(cmds.length-1))];if(cmd=="R"){cmd+=rear[Math.round(Math.random()*(rear.length-1))]}command+=cmd}command=command.replace(/GG/igm,"G");return command}
+this.getFullKey=function(){var key=this.generateKey().replace(/-/igm,"_");var dic=this.dictionaryToString(this.generateDictionary(6));return key+"-"+dic+"-"+this.getCommands()}
+this.getKeyParts=function(fullKey){var parts=fullKey.split("-");return parts}
+this.stringToCommands=function(command){var cmds=[];for(var i=0;i<command.length;i++){var chr=parseInt(command[i]);if(isNaN(chr)==true){cmds[cmds.length]=[];cmds[cmds.length-1][0]=command[i]}else{if(cmds[cmds.length-1][1]==undefined){cmds[cmds.length-1][1]=""}cmds[cmds.length-1][1]+=command[i]}}return cmds}
+this.encrypt=function(bits,key,dictionary,cmds,callback){try{bits=this.to512Multiply(bits);let allprc=new Array(cmds.length);let lastsum=-1;for(var i=0;i<cmds.length;i++){let procent=function(prc){let p=Math.round(prc);let sum=0;allprc[i]=p;for(var j=0;j<=i;j++){sum+=allprc[j]}sum=sum/cmds.length;if(sum!=lastsum){lastsum=sum;if(callback!=undefined){setTimeout(function(){let p=sum;callback(p)},0)}}};if(cmds[i][0]=="G"){bits=this.applyGamma(bits,key,procent)}else if(cmds[i][0]=="R"){bits=this.rearrange(bits,parseInt(cmds[i][1]),procent)}else if(cmds[i][0]=="D"){bits=this.replaceFromDictionary(bits,dictionary,procent)}}}catch(e){if(callback!=undefined){setTimeout(function(){callback(-1)},0)}return[]}return bits}
+this.decrypt=function(bits,key,dictionary,cmds,callback){try{let allprc=new Array(cmds.length);let lastsum=-1;for(var i=cmds.length-1;i>=0;i--){let procent=function(prc){let p=Math.round(prc);let sum=0;allprc[i]=p;for(var j=cmds.length-1;j>=i;j--){sum+=allprc[j]}sum=sum/cmds.length;if(sum!=lastsum){lastsum=sum;if(callback!=undefined){setTimeout(function(){let p=sum;callback(p)},0)}}};if(cmds[i][0]=="G"){bits=this.applyGamma(bits,key,procent)}else if(cmds[i][0]=="R"){bits=this.rearrangeBack(bits,parseInt(cmds[i][1]),procent)}else if(cmds[i][0]=="D"){bits=this.replaceFromDictionaryBack(bits,dictionary,procent)}}bits=this.from512Multiply(bits)}catch(e){if(callback!=undefined){setTimeout(function(){callback(-1)},0)}return[]}return bits}
+this.encryptFast=function(message,fullKey,callback){var parts=this.getKeyParts(fullKey);var gamma=this.stringToBits(parts[0]);var dictionary=this.stringToDictionary(parts[1]);var commands=this.stringToCommands(parts[2]);return this.bitsToString(this.encrypt(this.stringToBits(message),gamma,dictionary,commands,callback))}
+this.decryptFast=function(message,fullKey,callback){var parts=this.getKeyParts(fullKey);var gamma=this.stringToBits(parts[0]);var dictionary=this.stringToDictionary(parts[1]);var commands=this.stringToCommands(parts[2]);return this.bitsToString(this.decrypt(this.stringToBits(message),gamma,dictionary,commands,callback))}
+this.stringToBase16=function(text){var chars=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];var bits=this.stringToBits(text);var encoded="";for(var i=0;i<(bits.length-bits.length%4)/4;i++){var bts=[];for(var j=i*4;j<i*4+4;j++){bts[bts.length]=bits[j]}encoded+=chars[this.bitsToNumber(bts)]}return encoded}
+this.base16ToString=function(text){var chars=["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f"];var decoded="";for(var i=0;i<text.length/4;i++){var bts=[];for(var j=i*4;j<i*4+4;j++){for(var k=0;k<chars.length;k++){if(chars[k]==text[j]){bts=this.arrMerge(bts,this.numberToBits(k,4));break}}}decoded+=this.bitsToString(bts)}return decoded}
+}
+cr = new creepter();
+
+
+// БАЗОВЫЕ МЕТОДЫ
+//
+// bits[] numberToBits(number [, number]) - получает число и возвращает массив бит длинной в 16 [если задано второе число: 0 - обрезаются незначащие нули числа, иное положительное - биты выравниваются по количеству]
+// number bitsToNumber(bits[]) - получает массив бит и возвращает десятичное число
+// object[] arrMerge(object1[], object2[]) - "склеивает" два одномерных массива
+// bits[] numbersToBits(number[]) - возвращает массив бит получая массив десятичных чисел (16 бит на число. Диапазон 0-2^16)
+// number[] bitsToNumbers(bits[]) - возвращает массив чисел получая массив бит
+// bits[] stringToBits(string) - возвращает массив бит для символов строки
+// string bitsToString(bits[]) - формирует строку из массива бит
+//
+// КРИПТО-ЧАСТЬ
+//
+// callback - некоторые функци в конце имеют данный аргумент. Это функция обратного вызова. Получает при каждом вызове общий процент выполненой задачи (0-100)
+//
+// bits[] to512Multiply(bits[]) - принимает биты сообщения, делает их количество кратным 512 и добавляет в начало сообщения 512 бит - число указывающее на количество мусорных символов с конца
+// bits[] from512Multiply(bits[]) - принимает массив битов кратный 512 и снимает кратность
+// bits[] applyGamma(bits1[], bits2[], callback) - принимает биты сообщения и 512 битов гаммы-ключа которые применяет методом XOR к сообщению (таким образом может использоваться как для шифрования, так и расшифрования)
+// bits[] rearrange(bits[], number, callback) - производит перестановку "вперёд" блоков длинны number местами. number должен быть кратен длинне массива битов
+// bits[] rearrangeBack(bits[], number, callback) - производит перестановку обратную rearrangeForward "назад", что позволяет отменить влияние вышеописанной функции, аргументы аналогичны
+// bits[] replaceFromDictionary(bits[], bits[][], callback) - меняет цепочки бит по словарю. Принимает биты и двумерный массив с массивами бит которые необходимо заменить
+// bits[] replaceFromDictionaryBack(bits[], bits[][], callback) - расшифровывает сообщение принимая те же аргументы что и функция выше.
+//
+// ФУНКЦИИ ВЕРХНЕГО УРОВНЯ
+//
+// bits[][] generateDictionary(number) - вернёт двумерный массив - случайно сгенерированый словарь с заданой длинной цепочек бит (рекомендуемые значения: 4 - 9 (можно и больше, но там либо комп взрывается, либо выход за 512 бит (что дэфолт для блока шифра))
+// string dictionaryToString(bits[][]) - упаковывает двумерный массив словаря в текстовую строку
+// bits[][] stringToDictionary(string) - распаковывает строку в словарь
+// string generateKey() - возвращает случайный 512 битный ключь (32 символа)
+// string getCommands() - возвращает строку со случайными командами шифрования типа GR4DR128
+//
+// ФУНКЦИИ ВЫСШЕГО УРОВНЯ
+//
+// string getFullKey() - возвращает случайный сгенерированый ключ
+// string[] getKeyParts(string) - возвращает одномерный массив размером в 3 ячейки состоящий из частей ключа
+// string[][] stringToCommands() - возвращает представление комманд в виде двумерного массива (GDR128)
+// bits[] encrypt(bits[], bits[], bits[][], string[][], callback) - возвращает полностью зашифрованный массив битов используя 512-битную гамму ключа, словарь замены и двумерный массив - алгоритма шифрования
+// bits[] decrypt(bits[], bits[], bits[][], string[][], callback) - возвращает полностью расшифрованный и готовый к переводу в сообщение массив битов, аргументы аналогичны вышеописанной функции
+// string encryptFast(string, string, callback) - принимает строку сообщения и строку полного ключа, возвращает зашифрованный текст (не рекомендуется к использованию, лишние расходы производительности на конвертацию типов)
+// string decryptFast(string, string, callback) - аналогична функции выше.
+// string stringToBase16(string) - принимает обычную строку в формате UTF-16 и представляет её в виде 16-ричной системы счисления, по 4 символа на один символ строк UTF-16. Удобно при передаче методом GET.
+// string base16ToString(string) - выплняет обратную вышеописанной функци функцию.
+//
+// сделать наложение гаммы-ключа.
+// Учитывая что на символ - 16 бит, тогда ключ можно поставить равным 32 символам, т.е. 512 битам. Или же 9 байтам
+// Полученная строка из 32 символов так же переводится в массив бит, а затем гамма уравнивается по длинне с длинной сообщения (или же mod перебирает тот же массив по нескольку раз).
+// Там где матрица имеет 1, бит сообщения инвертируется (XOR)
+// Сообщение обратно переводится в строку и отправляется получателю который расшифровывает его тем же ключом.
+//
+// сообщение делится на блоки по 32 символа (по 512 бит)
+// если сообщение не содержит полный блок, тогда оставшиеся ячейки заполняются случайными символами (мусором)
+// первые 9 бит - число от 0 до 512 - количество свободных битов с конца сообщения, в случае не полного заполнения блока. (они будут обрезаны при расшифровке)
+	

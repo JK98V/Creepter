@@ -1,0 +1,230 @@
+/*
+.message && .message-other && .message-system && .message-process
+	.message-body
+		.message-text
+	.message-date
+		.dateup
+*/
+
+.dialog-list {
+	position: absolute;
+	top: 50px;
+	left: 0px;
+	width: 100vw;
+	height: calc(100vh - 200px);
+	
+	overflow-x: hidden;
+	overflow-y: scroll;
+	
+	/*background-color: rgba(230, 240, 240, 1);*/
+}
+
+.message {
+	position: relative;
+	width: 70%;
+	left: 30%;
+	height: auto;
+	
+	opacity: 1;
+	transform: scale(1);
+	
+	animation: 0.3s ease 1 message-showing;
+}
+
+@keyframes message-showing {
+	0% { 
+		opacity: 0; 
+		transform: scale(0.9);
+	}
+	100% { 
+		opacity: 1; 
+		transform: scale(1);
+	}
+}
+
+.message-body {
+	position: relative;
+	margin-top: 10px;
+	margin-right: 20px;
+	padding: 10px;
+	
+	border-radius: 0px;
+	border-right: 5px solid rgba(0, 0, 0, 0.4);
+	
+	background-color: rgba(230, 255, 230, 1);
+	box-shadow: 0px 0px 0px rgba(0, 0, 0, 0.2);
+}
+
+.message-text {
+	opacity: 1;
+	position: relative;
+}
+
+.message-date {
+	opacity: 0.3;
+	position: relative;
+	text-align: left;
+	margin-top: 10px;
+}
+
+
+.message-other {
+	left: 0%;
+}
+.message-other > .message-body {
+	margin-left: 20px;
+	margin-right: 0px;
+	
+	border-right: none;
+	border-left: 5px solid rgba(0, 0, 0, 0.4);
+	
+	background-color: rgba(250, 250, 250, 1);
+}
+.message-other > .message-date {
+	text-align: right;
+}
+
+
+
+
+.message-process > .message-date:after {
+	margin: 20px;
+	content: "PROCESSING...";
+}
+
+.message-process > .message-body > .message-text {
+	opacity: 0;
+	position: absolute;
+}
+
+.message-process > .message-body:before {
+	content: " ";
+	position: relative;
+	padding-left: 5%;
+	margin-left: 0%;
+	
+	background-color: black;
+	opacity: 0.3;
+	
+	animation: 2s ease infinite message-body-before-animation;
+}
+
+.message-process > .message-body:after {
+	content: " ";
+	position: relative;
+	padding-left: 5%;
+	margin-left: 90%;
+	
+	background: black;
+	opacity: 0.3;
+	
+	animation: 2s ease infinite message-body-after-animation;
+}
+
+@keyframes message-body-before-animation {
+	0% {
+		margin-left: 0%;
+		opacity: 0.3;
+	}
+	50% {
+		margin-left: 45%;
+		opacity: 0.6;
+	}
+	100% {
+		margin-left: 0%;
+		opacity: 0.3;
+	}
+}
+
+@keyframes message-body-after-animation {
+	0% {
+		margin-left: 90%;
+		opacity: 0.3;
+	}
+	50% {
+		margin-left: 0%;
+		opacity: 0.6;
+	}
+	100% {
+		margin-left: 90%;
+		opacity: 0.3;
+	}
+}
+
+
+.message-system {
+	left: 0%;
+	width: 100%;
+}
+.message-system > .message-body > .message-text {
+	text-align: center;
+	color: rgba(0, 0, 0, 0.8);
+}
+.message-system > .message-body {
+	padding: 3px;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	margin-left: 0px;
+	width: 80%;
+	left: 10%;
+	
+	border-radius: 0px;
+	border-top: 1px solid rgba(0, 0, 0, 0.2);
+	border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+	border-right: none;
+	
+	background-color: transparent;
+	box-shadow: none;
+}
+.message-system > .message-body > .message-text:before {
+	content: "SYSTEM:";
+	
+	position: relative;
+	height: 5px;
+	margin-right: 20px;
+	
+	color: gray;
+}
+.message-system > .message-date {
+	opacity: 0;
+	position: absolute;
+}
+
+
+
+.dateup {
+	position: relative;
+	top: -4pt;
+	font-size: 80%;
+}
+.dateup:before {
+	content: " ";
+}
+
+/* Адаптация для мобилок */
+
+@media screen and (max-width: 720px) {
+	.message {
+		width: 90%;
+		left: 5%;
+	}
+	.message-body {
+		margin-right: 0px;
+	}
+	.message-other > .message-body {
+		margin-left: 0px;
+	}
+	.message-system {
+		overflow: hidden;
+	}
+	.message-system > .message-body {
+		width: 100%;
+		left: 0vw;
+	}
+	.message-date {
+		text-align: center;
+	}
+	.message-other > .message-date {
+		text-align: center;
+	}
+}
